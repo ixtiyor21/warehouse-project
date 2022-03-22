@@ -13,6 +13,7 @@ import com.example.lesson11.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -61,5 +62,43 @@ public class ProductService {
         product.setMeasurement(measurementOptional.get());
         productRepository.save(product);
         return new Result("Product saved",true);
+    }
+
+    public List<Product> getProducts() {
+        return productRepository.findAll();
+    }
+
+    public Result getProduct(Integer id) {
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if(optionalProduct.isEmpty())
+            return new Result("Product not found",false);
+        return new Result(optionalProduct.get(),true);
+    }
+
+    public Result editProduct(Integer id, ProductDto productDto) {
+        Optional<Product> productOptional = productRepository.findById(id);
+        if(productOptional.isEmpty())
+            return new Result("Product not found",false);
+        Product product = productOptional.get();
+        product.setName(productDto.getName());
+
+        Optional<Category> categoryOptional = categoryRepository.findById(productDto.getCategoryId());
+        if (categoryOptional.isEmpty()) {
+            return new Result("Category not found",false);
+        }
+
+        Optional<Attachment> optionalAttachment = attachmentRepository.findById(productDto.getPhotoId());
+        if (optionalAttachment.isEmpty()) {
+            return new Result("Photo not found",false);
+        }
+
+        Optional<Measurement> measurementOptional = measurementRepository.findById(productDto.getMeasurementId());
+        if (measurementOptional.isEmpty()) {
+            return new Result("Measurement not found",false);
+        }
+        product.setCategory(categoryOptional.get());
+        product.setMeasurement(measurementOptional.get());
+        product.setPhoto(optionalAttachment.get());
+        return new Result("Product edited",true);
     }
 }

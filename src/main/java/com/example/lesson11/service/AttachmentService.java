@@ -7,11 +7,14 @@ import com.example.lesson11.repository.AttachmentContentRepository;
 import com.example.lesson11.repository.AttachmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Optional;
 
 /**
  * Author : Qozoqboyev Ixtiyor
@@ -43,5 +46,25 @@ public class AttachmentService {
             return new Result("Successfully saved",true,saveAttachment.getId());
         }
         return new Result("Bad request",false);
+    }
+
+    public Result getFile(Integer id, HttpServletResponse response) throws IOException {
+        Optional<Attachment> optionalAttachment = attachmentRepository.findById(id);
+        if (optionalAttachment.isEmpty()) {
+            return new Result("File not found",false);
+        }
+        Attachment attachment = optionalAttachment.get();
+
+        Optional<AttachmentContent> optionalAttachmentContent = attachmentContentRepository.findByAttachmentId(attachment.getId());
+        if (optionalAttachmentContent.isEmpty()) {
+            return new Result("File not found",false);
+        }
+        AttachmentContent attachmentContent = optionalAttachmentContent.get();
+        response.setHeader("Content-Disposition",
+                "attachment; filename=\"" + attachment.getName() + "\"");
+        response.setContentType(attachment.getContentType());
+
+        FileCopyUtils.copy(attachmentContent.getBytes(), response.getOutputStream());
+        return new Result("File downloaded",true);
     }
 }

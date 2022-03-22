@@ -4,10 +4,9 @@ import com.example.lesson11.entity.Measurement;
 import com.example.lesson11.payload.Result;
 import com.example.lesson11.service.MeasurementService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Author : Qozoqboyev Ixtiyor
@@ -27,5 +26,25 @@ public class MeasurementController {
         return result;
     }
 
-    //get list, get one , edit, delete;
+
+    @GetMapping
+    public List<Measurement> getMeasurements(){
+        return measurementService.getMeasurements();
+    }
+
+    @GetMapping("/{id}")
+    public Result getMeasurement(@PathVariable Integer id){
+        return measurementService.getMeasurement(id);
+    }
+
+    @PutMapping("/{id}")
+    public Result editMeasurement(@PathVariable Integer id,@RequestBody Measurement measurement){
+        return measurementService.editMeasurement(id,measurement);
+    }
+    @DeleteMapping("/{id}")
+    public Result deleteMeasurement(@PathVariable Integer id){
+        return measurementService.deleteMeasurement(id);
+    }
+
+
 }

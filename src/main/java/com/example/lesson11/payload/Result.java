@@ -23,4 +23,9 @@ public class Result {
         this.message = message;
         this.success = success;
     }
+
+    public Result(Object object , boolean success) {
+        this.success = success;
+        this.object = object;
+    }
 }
